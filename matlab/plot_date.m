@@ -2,7 +2,7 @@ clear all; clc; close all;
 
 year = '2020';  % 指定年份
 signal = 'S2W';
-path = 'D:\projects\SFPDpy\DTW_result\';
+path = 'F:\data\result\ver2\DTW_results\';
 
 % 定义站点列表
 stations = {'AIRA', 'BAIE', 'BIK0', 'CAS1'};

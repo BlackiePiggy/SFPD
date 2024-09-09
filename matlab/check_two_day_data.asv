@@ -5,8 +5,8 @@ station = 'CAS1';
 signal = 'S2W';
 satno = 'G32';
 
-date1 = '5/27';
-date2 = '5/26';
+date1 = '7/12';
+date2 = '';
 date_full1 = [year,'/',date1];
 date_full2 = [year,'/',date2];
 
