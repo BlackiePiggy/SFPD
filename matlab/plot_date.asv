@@ -1,6 +1,6 @@
 clear all; clc; close all;
 
-year = '2022';  % 指定年份
+year = '2020';  % 指定年份
 signal = 'S2W';
 path = 'F:\data\result\ver3\DTW_results\';
 
@@ -23,7 +23,7 @@ if isfile(event_file)
     else
         error('The event list for the specified year does not exist.');
     end
-
+print
     % 动态构建事件的日期列表（假设 event_list 中是年中的日）
     event_datetime_list = datetime(str2double(year), 1, 1) + days(event_list - 1);
 else
@@ -82,9 +82,15 @@ for station_idx = 1:length(stations)
         value = data_struct.(field_names{i}){:, 2};  % 提取值
         % 如果有value中有nan值，则不绘制这个点
         validIndices = ~isnan(value);
-        % 对value(validIndices)进行归一化
-        validtime - 
-        plot(time(validIndices), value(validIndices), 'o', 'DisplayName', field_names{i});  % 使用'o'表示点样式
+        
+        validtime =  time(validIndices);
+        validvalue = value(validIndices);
+        % 归一化处理: 将值缩放到 [0, 1] 之间
+        minVal = min(validvalue);
+        maxVal = max(validvalue);
+        normalizedValue = (validvalue - minVal) / (maxVal - minVal);
+        plot(validtime, validvalue, 'o', 'DisplayName', field_names{i});  % 使用'o'表示点样式
+        plot(validtime, normalizedValue, 'o', 'DisplayName', field_names{i});  % 使用'o'表示点样式
     end
     
     % 找到当天图的纵轴最大值

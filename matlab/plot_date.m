@@ -1,6 +1,6 @@
 clear all; clc; close all;
 
-year = '2022';  % 指定年份
+year = '2020';  % 指定年份
 signal = 'S2W';
 path = 'F:\data\result\ver3\DTW_results\';
 
@@ -23,7 +23,7 @@ if isfile(event_file)
     else
         error('The event list for the specified year does not exist.');
     end
-
+print
     % 动态构建事件的日期列表（假设 event_list 中是年中的日）
     event_datetime_list = datetime(str2double(year), 1, 1) + days(event_list - 1);
 else
