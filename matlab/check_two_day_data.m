@@ -1,12 +1,12 @@
 clc; clear all;
 
 year = '2020';
-station = 'CAS1';
+station = 'AIRA';
 signal = 'S2W';
-satno = 'G32';
+satno = 'G01';
 
-date1 = '5/27';
-date2 = '5/26';
+date1 = '5/11';
+date2 = '5/10';
 date_full1 = [year,'/',date1];
 date_full2 = [year,'/',date2];
 
@@ -45,6 +45,19 @@ figure;
 hold on;
 plot(time1_plot, value1, '.r', 'DisplayName', date_full1); % date1的点图，用红色圆点表示
 plot(time2_plot, value2, '.b', 'DisplayName', date_full2); % date2的点图，用蓝色圆点表示
+
+% 检测value1中的NaN值，并标记
+nan_idx1 = isnan(value1);
+plot(time1_plot(nan_idx1), zeros(sum(nan_idx1), 1), 'xr', 'MarkerSize', 10, 'LineWidth', 2);
+
+% 检测value2中的NaN值，并标记
+nan_idx2 = isnan(value2);
+plot(time2_plot(nan_idx2), zeros(sum(nan_idx2), 1), 'xb', 'MarkerSize', 10, 'LineWidth', 2);
+
+% 打印两天的NaN值数量
+fprintf('Date %s has %d NaN values.\n', date_full1, sum(nan_idx1));
+fprintf('Date %s has %d NaN values.\n', date_full2, sum(nan_idx2));
+
 xlabel('Time (HH:MM:SS)');
 ylabel('Value');
 title(['Data for ', date_full1, ' and ', date_full2]);

@@ -1,28 +1,34 @@
 clear all; clc; close all;
 
-year = '2020';  % 指定年份
+year = '2022';  % 指定年份
 signal = 'S2W';
-path = 'F:\data\result\ver2\DTW_results\';
+path = 'F:\data\result\ver3\DTW_results\';
 
 % 定义站点列表
 stations = {'AIRA', 'BAIE', 'BIK0', 'CAS1'};
 
 % 动态加载 event_{year}_list.mat 文件
 event_file = sprintf('event_%s_list.mat', year);
-load(event_file);  % 加载对应年份的 event_list 变量
 
-% 根据年份动态获取事件列表变量的名称
-event_list_var = sprintf('event_%s_list', year);
+% 检查 event_file 是否存在
+if isfile(event_file)
+    load(event_file);  % 加载对应年份的 event_list 变量
 
-% 使用 eval 获取对应的事件列表变量
-if exist(event_list_var, 'var')
-    event_list = eval(event_list_var);  % 获取 event_{year}_list 的值
+    % 根据年份动态获取事件列表变量的名称
+    event_list_var = sprintf('event_%s_list', year);
+
+    % 使用 eval 获取对应的事件列表变量
+    if exist(event_list_var, 'var')
+        event_list = eval(event_list_var);  % 获取 event_{year}_list 的值
+    else
+        error('The event list for the specified year does not exist.');
+    end
+
+    % 动态构建事件的日期列表（假设 event_list 中是年中的日）
+    event_datetime_list = datetime(str2double(year), 1, 1) + days(event_list - 1);
 else
-    error('The event list for the specified year does not exist.');
+    event_datetime_list = [];  % 如果没有 event_file，事件日期列表为空
 end
-
-% 动态构建事件的日期列表（假设 event_list 中是年中的日）
-event_datetime_list = datetime(str2double(year), 1, 1) + days(event_list - 1);
 
 % 创建一个新的 figure
 figure;
@@ -44,8 +50,13 @@ for station_idx = 1:length(stations)
     for k = 1:length(filelist)
         % 读取当前文件的数据
         filepath = fullfile(filelist(k).folder, filelist(k).name);
-        data = readtable(filepath, 'ReadVariableNames', false);
-        
+        % 1. 先检测导入选项
+        opts = detectImportOptions(filepath, 'ReadVariableNames', false);
+        % 2. 强制将第二列的类型设置为 double
+        opts = setvartype(opts, opts.VariableNames{2}, 'double');
+        % 3. 按照修改后的导入选项读取表格
+        data = readtable(filepath, opts);
+                
         % 获取文件名中的 '*' 部分作为数组名称
         [~, filename, ~] = fileparts(filelist(k).name);
         tokens = strsplit(filename, '_');
@@ -69,16 +80,28 @@ for station_idx = 1:length(stations)
         timeStrings = data_struct.(field_names{i}){:, 1};  % 提取时间字符串
         time = datetime(timeStrings, 'InputFormat', 'yyyy-MM-dd');  % 转换为 datetime 类型
         value = data_struct.(field_names{i}){:, 2};  % 提取值
-        plot(time, value, 'o', 'DisplayName', field_names{i});  % 使用'o'表示点样式
+        % 如果有value中有nan值，则不绘制这个点
+        validIndices = ~isnan(value);
+        
+        validtime =  time(validIndices);
+        validvalue = value(validIndices);
+        % 归一化处理: 将值缩放到 [0, 1] 之间
+        minVal = min(validvalue);
+        maxVal = max(validvalue);
+        normalizedValue = (validvalue - minVal) / (maxVal - minVal);
+        plot(validtime, validvalue, 'o', 'DisplayName', field_names{i});  % 使用'o'表示点样式
+        plot(validtime, normalizedValue, 'o', 'DisplayName', field_names{i});  % 使用'o'表示点样式
     end
     
     % 找到当天图的纵轴最大值
     ylim_values = ylim;
     max_value = ylim_values(2);
     
-    % 在事件日期上绘制'×'
-    for j = 1:length(event_datetime_list)
-        plot(event_datetime_list(j), max_value, 'rx', 'MarkerSize', 10, 'LineWidth', 2);
+    % 如果有 event_datetime_list，则在事件日期上绘制'×'
+    if ~isempty(event_datetime_list)
+        for j = 1:length(event_datetime_list)
+            plot(event_datetime_list(j), max_value, 'rx', 'MarkerSize', 10, 'LineWidth', 2);
+        end
     end
     
     hold off;
@@ -121,4 +144,3 @@ function txt = myUpdateFcn(~, event_obj)
            ['Y: ', y_value], ...
            ['Field: ', fieldname]};
 end
-

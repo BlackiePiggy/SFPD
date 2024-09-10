@@ -14,8 +14,8 @@ plot_dpi = 100  # 图形的分辨率
 input_data_path = 'F:/data/dataset'  # 输入CSV文件所在目录
 
 # 自定义输出路径
-output_image_dir_base = 'F:/data/result/ver2/images'  # 图像输出基础路径
-output_DTW_dir_base = 'F:/data/result/ver2/DTW_results'  # DTW输出路径
+output_image_dir_base = 'F:/data/result/ver3/images'  # 图像输出基础路径
+output_DTW_dir_base = 'F:/data/result/ver3/DTW_results'  # DTW输出路径
 
 # 调用SFPD计算函数
 calculate_sfpd(years, stations, signals, svn_range, timestamp_format, residual_threshold, save_plots, figsize, plot_dpi,

@@ -1,0 +1,9 @@
+- 日期第一天，拿到第一天的数据
+- 输出firstday
+- 把当日数据赋给seasonal mean
+- 进入主循环
+    - todate日期+1，取当日数据
+    - 查询用于seasonal mean计算的最后一天日期sm_lastdate是多少
+    - 判断当日日期todate与sm_lastdate是否连续
+        - 否，输出lackdate
+        - 更新seasonal mean为当日数据
