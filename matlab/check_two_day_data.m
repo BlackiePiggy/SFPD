@@ -1,12 +1,12 @@
-clc; clear all;
+clc; clear all;close all;
 
 year = '2020';
 station = 'BAIE';
 signal = 'S2W';
-satno = 'G15';
+satno = 'G05';
 
-date1 = '6/8';
-date2 = '6/7';
+date1 = '6/18';
+date2 = '6/21';
 date_full1 = [year,'/',date1];
 date_full2 = [year,'/',date2];
 

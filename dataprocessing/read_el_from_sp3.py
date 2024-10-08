@@ -5,7 +5,6 @@ import datetime
 from pyproj import Transformer
 import utils
 
-
 def read_el_from_sp3(station_name, inputdir, output_folder, satellite_code, station_llh, start_date_str, end_date_str):
     utils.create_directory_if_not_exists(output_folder)
 
