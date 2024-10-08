@@ -106,7 +106,7 @@ def calculate_satellite_elevations(filename, station_llh, output_folder,satellit
 
                 del elevation_data
 
-            return 0  # 执行成功
+        return 0  # 执行成功
     except Exception as e:
         print(f"An error occurred: {e}")
         return 1  # 执行失败

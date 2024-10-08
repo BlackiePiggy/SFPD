@@ -33,7 +33,7 @@ for year in range(2022, 2023):  # 遍历2022到2023年
     ######################################################################
 
     # 第一步：读取所有obs文件，提取CN值，存储到timeCN文件夹中
-    readCN.read_CN_value_from_obs_AAO(station_name, SS_variables, satellite_code, test_input_obs_folder, test_output_cn_folder, test_start_date, test_end_date)  # 正常日期
+    #readCN.read_CN_value_from_obs_AAO(station_name, SS_variables, 'all', test_input_obs_folder, test_output_cn_folder, test_start_date, test_end_date)  # 正常日期
 
     readEL.read_el_from_sp3(station_name, test_input_sp3_dir, test_output_el_folder, satellite_range, station_llh, test_start_date, test_end_date)
 
