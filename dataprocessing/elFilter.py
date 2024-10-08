@@ -2,7 +2,7 @@ import os
 import pandas as pd
 
 
-def filter_cn_el_files(station_name, SS_variables, satellite_code, output_cn_el_folder, time_cn_el_filtered_folder, start_date_str, end_date_str, el_mask):
+def filter_cn_el_files(station_name, SS_variables, satellite_range, output_cn_el_folder, time_cn_el_filtered_folder, start_date_str, end_date_str, el_mask):
     # 确保输出目录存在
     os.makedirs(time_cn_el_filtered_folder, exist_ok=True)
 
@@ -10,48 +10,34 @@ def filter_cn_el_files(station_name, SS_variables, satellite_code, output_cn_el_
     start_date = pd.to_datetime(start_date_str, format='%Y%j')
     end_date = pd.to_datetime(end_date_str, format='%Y%j')
 
-    # 遍历 output_cn_el_folder 的文件
-    for file in os.listdir(output_cn_el_folder):
-        file_path = os.path.join(output_cn_el_folder, file)
+    #遍历日期
+    for date in pd.date_range(start=start_date, end=end_date):
 
-        # 检查文件名中的日期是否在指定范围内
-        try:
-            file_date_str = file[5:12]  # 假设文件名中日期格式为 'YYYYDOY'
-            file_date = pd.to_datetime(file_date_str, format='%Y%j')
-        except ValueError:
-            print(f"Skipping file {file} due to invalid date format")
-            continue
+        for satellite_code in satellite_range:
+            # 找到每一天对应的CN_EL文件，如果找不到，跳过并输出提示信息
+            # 文件名称格式示例：AIRA_2021001_CN_G09_S2W_el.csv
+            cn_el_name = f"{station_name}_{date.strftime('%Y%j')}_CN_{satellite_code}_{SS_variables[0]}_el.csv"
+            full_cn_el_path = os.path.join(output_cn_el_folder, cn_el_name)
+            if not os.path.exists(full_cn_el_path):
+                print(f"CN_EL file {cn_el_name} not found. Skipping...")
+                continue
 
-        # 检查文件名中的站点名称是否与指定的一致
-        try:
-            file_station_str = file[0:4]
-        except ValueError:
-            print(f"Skipping file {file} due to invalid station name format")
-            continue
-
-        # 检查SS和卫星号是否与指定的一致，文件示例：BAIE_2021358_CN_G01_S1W_el.csv
-        try:
-            file_SS_str = file[20:23]
-            file_satellite_str = file[16:19]
-        except ValueError:
-            print(f"Skipping file {file} due to invalid signal strength or satellite format")
-            continue
-
-        if (start_date <= file_date <= end_date) and (file_station_str == station_name) and (file_SS_str == SS_variables[0]) and (file_satellite_str == satellite_code):
             # 检查输出文件是否已经存在
-            output_file = os.path.join(time_cn_el_filtered_folder, f"{os.path.splitext(file)[0]}_{el_mask}_filtered.csv")
+            output_file = os.path.join(time_cn_el_filtered_folder, f"{os.path.splitext(cn_el_name)[0]}_{el_mask}_filtered.csv")
             if os.path.exists(output_file):
                 print(f"File {output_file} already exists. Skipping...")
                 continue
 
             # 读取文件
-            df = pd.read_csv(file_path)
-
+            df = pd.read_csv(full_cn_el_path)
             # 过滤掉elevation小于el_mask的行
             filtered_df = df[df.iloc[:, 2] >= el_mask]
 
             # 输出过滤后的文件
             filtered_df.to_csv(output_file, index=False)
             print(f"Saved filtered file: {output_file}")
-        else:
-            print(f"File {file} is not in the date range.")
+
+            # 删除变量
+            del df
+            del filtered_df
+    print("All files filtered successfully!")
