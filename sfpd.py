@@ -248,11 +248,14 @@ def calculate_sfpd(years, stations, signals, svn_range, timestamp_format, residu
 
 
                     # 6.5 将 dist_all 与时间戳一起保存到 CSV 文件
-                    dist_all_df = pd.DataFrame({
-                        'Date': unique_dates,  # 对应的日期（去掉第一天，因为从第二天开始计算DTW距离）
-                        'DTW Distance': dist_all
-                    })
-                    dist_all_df.to_csv(os.path.join(output_DTW_dir, output_DTW_name), index=False)
+                    if len(unique_dates) != len(dist_all):
+                        print(f"Warning: Length of unique_dates ({len(unique_dates)}) does not match dist_all ({len(dist_all)}).")
+                    else:
+                        dist_all_df = pd.DataFrame({
+                            'Date': unique_dates,  # 对应的日期（去掉第一天，因为从第二天开始计算DTW距离）
+                            'DTW Distance': dist_all
+                        })
+                        dist_all_df.to_csv(os.path.join(output_DTW_dir, output_DTW_name), index=False)
 
 
 def movingWindowDTW(s_today, s_seasonal, step_size):

@@ -1,7 +1,7 @@
 clear all; clc;
 
 year = '2020';
-station = 'AIRA';
+station = 'KAT1';
 signal = 'S2W';
 path = 'D:\projects\SFPDpy\DTW_result\';
 

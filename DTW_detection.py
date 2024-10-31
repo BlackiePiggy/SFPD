@@ -6,8 +6,8 @@ import matplotlib.pyplot as plt
 from collections import defaultdict
 
 # Step 0: Initialize
-station = 'CAS1'  # Replace with actual station name
-year = '2021'  # Replace with actual year
+stations = ['HAL1','HLFX','KAT1','SAVO','STFU']  # Replace with a list of actual station names
+years = ['2022', '2023','2024']  # Replace with a list of actual years
 signal = 'S2W'  # Replace with actual signal name
 
 # Set input and output folders
@@ -30,87 +30,103 @@ def date_to_doy(date):
     return date.timetuple().tm_yday
 
 
-# Step 1: Process each satellite
-for sat_num in range(1, 33):
-    sat = f'G{sat_num:02d}'  # Generate satellite ID (G01, G02, ..., G32)
+# Function to process each station and year
+def process_station_year(station, year):
+    print(f"Processing station: {station}, year: {year}")
 
-    # Construct file path
-    file_path = os.path.join(input_folder, f'{station}_{year}_{signal}_{sat}_DTW.csv')
+    # Initialize for current station and year
+    current_all_dates = set()
+    current_all_data = defaultdict(dict)
 
-    # Check if the file exists before attempting to read it
-    if os.path.isfile(file_path):
-        # Read data, handling non-numeric elements as NaN
-        data = pd.read_csv(file_path, parse_dates=[0])
-        dates = data.iloc[:, 0]
-        values = pd.to_numeric(data.iloc[:, 1], errors='coerce')
+    # Step 1: Process each satellite
+    for sat_num in range(1, 33):
+        sat = f'G{sat_num:02d}'  # Generate satellite ID (G01, G02, ..., G32)
 
-        # Method 1: IQR (Interquartile Range) method
-        multiplier = 9  # Default is 1.5, can be manually adjusted
+        # Construct file path
+        file_path = os.path.join(input_folder, f'{station}_{year}_{signal}_{sat}_DTW.csv')
 
-        Q1 = values.quantile(0.25)
-        Q3 = values.quantile(0.75)
-        IQR = Q3 - Q1
+        # Check if the file exists before attempting to read it
+        if os.path.isfile(file_path):
+            # Read data, handling non-numeric elements as NaN
+            data = pd.read_csv(file_path, parse_dates=[0])
+            dates = data.iloc[:, 0]
+            values = pd.to_numeric(data.iloc[:, 1], errors='coerce')
 
-        # Adjust upper bound based on multiplier
-        upper_bound = Q3 + multiplier * IQR
+            # Method 1: IQR (Interquartile Range) method
+            multiplier = 9  # Default is 1.5, can be manually adjusted
 
-        # Mark outliers
-        is_outlier = values > upper_bound
+            Q1 = values.quantile(0.25)
+            Q3 = values.quantile(0.75)
+            IQR = Q3 - Q1
 
-        # Record outlier dates and values
-        outlier_dates = dates[is_outlier]
-        outlier_values = values[is_outlier]
+            # Adjust upper bound based on multiplier
+            upper_bound = Q3 + multiplier * IQR
 
-        # Plot and save figure
-        plt.figure(figsize=(12, 6))
-        plt.scatter(dates[~is_outlier], values[~is_outlier], c='b', label='Non-Outlier Data')
-        plt.scatter(outlier_dates, outlier_values, c='r', label='Outliers')
-        plt.axhline(y=upper_bound, color='r', linestyle='--', label=f'Upper Threshold: {upper_bound:.2f}')
+            # Mark outliers
+            is_outlier = values > upper_bound
 
-        plt.xlabel('Date')
-        plt.ylabel('Value')
-        plt.title(f'Time Series Data with Outliers - {station} {year} - {sat}')
-        plt.legend()
+            # Record outlier dates and values
+            outlier_dates = dates[is_outlier]
+            outlier_values = values[is_outlier]
 
-        image_path = os.path.join(image_output_folder, f'{station}_{year}_{signal}_{sat}_OutlierDetection.png')
-        plt.savefig(image_path)
-        plt.close()
+            # Plot and save figure
+            plt.figure(figsize=(12, 6))
+            plt.scatter(dates[~is_outlier], values[~is_outlier], c='b', label='Non-Outlier Data')
+            plt.scatter(outlier_dates, outlier_values, c='r', label='Outliers')
+            plt.axhline(y=upper_bound, color='r', linestyle='--', label=f'Upper Threshold: {upper_bound:.2f}')
 
-        # Calculate DOY
-        doy = dates.apply(date_to_doy)
+            plt.xlabel('Date')
+            plt.ylabel('Value')
+            plt.title(f'Time Series Data with Outliers - {station} {year} - {sat}')
+            plt.legend()
 
-        # Output results as CSV file
-        output_df = pd.DataFrame({'Date': dates, 'DOY': doy, 'IsOutlier': is_outlier.astype(int)})
-        output_path = os.path.join(output_folder, f'{station}_{year}_{signal}_{sat}_OutlierDetectionResults.csv')
-        output_df.to_csv(output_path, index=False)
+            image_path = os.path.join(image_output_folder, f'{station}_{year}_{signal}_{sat}_OutlierDetection.png')
+            plt.savefig(image_path)
+            plt.close()
 
-        # Add dates to all_dates
-        all_dates.update(dates)
+            # Calculate DOY
+            doy = dates.apply(date_to_doy)
 
-        # Store satellite data
-        all_data[sat_num] = dict(zip(dates.astype(str), is_outlier.astype(int)))
-    else:
-        print(f'File not found: {file_path}')
+            # Output results as CSV file
+            output_df = pd.DataFrame({'Date': dates, 'DOY': doy, 'IsOutlier': is_outlier.astype(int)})
+            output_path = os.path.join(output_folder, f'{station}_{year}_{signal}_{sat}_OutlierDetectionResults.csv')
+            output_df.to_csv(output_path, index=False)
 
-# Step 2: Consolidate data
-all_dates = sorted(all_dates)
-all_doy = [date_to_doy(date) for date in all_dates]
+            # Add dates to current_all_dates
+            current_all_dates.update(dates)
 
-# Create output data DataFrame
-output_data = pd.DataFrame({'Date': all_dates, 'DOY': all_doy})
+            # Store satellite data for current station and year
+            current_all_data[sat_num] = dict(zip(dates.astype(str), is_outlier.astype(int)))
+        else:
+            print(f'File not found: {file_path}')
 
-# Fill data
-for sat_num in range(1, 33):
-    sat = f'G{sat_num:02d}'
-    if sat_num in all_data:
-        output_data[sat] = output_data['Date'].astype(str).map(all_data[sat_num])
+    # Step 2: Consolidate data for current station and year
+    current_all_dates = sorted(current_all_dates)
+    current_all_doy = [date_to_doy(date) for date in current_all_dates]
 
-# Write to CSV file
-consolidated_output_path = os.path.join(consolidated_output_folder,
-                                        f'{station}_{year}_{signal}_ConsolidatedResults.csv')
-output_data.to_csv(consolidated_output_path, index=False)
+    # Create output data DataFrame
+    output_data = pd.DataFrame({'Date': current_all_dates, 'DOY': current_all_doy})
 
-print('Processing completed.')
-print(f'Outlier detection results saved to: {output_folder}')
-print(f'Outlier detection plots saved to: {image_output_folder}')
-print(f'Consolidated file saved to: {consolidated_output_path}')
+    # Fill data
+    for sat_num in range(1, 33):
+        sat = f'G{sat_num:02d}'
+        if sat_num in current_all_data:
+            output_data[sat] = output_data['Date'].astype(str).map(current_all_data[sat_num])
+
+    # Write to CSV file
+    consolidated_output_path = os.path.join(consolidated_output_folder,
+                                            f'{station}_{year}_{signal}_ConsolidatedResults.csv')
+    output_data.to_csv(consolidated_output_path, index=False)
+
+    print(f'Processing for station {station}, year {year} completed.')
+    print(f'Outlier detection results saved to: {output_folder}')
+    print(f'Outlier detection plots saved to: {image_output_folder}')
+    print(f'Consolidated file saved to: {consolidated_output_path}')
+
+
+# Process all station-year combinations
+for station in stations:
+    for year in years:
+        process_station_year(station, year)
+
+print('All stations and years processed.')

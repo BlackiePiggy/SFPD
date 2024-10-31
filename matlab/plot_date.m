@@ -1,11 +1,11 @@
 clear all; clc; close all;
 
-year = '2020';  % 指定年份
+year = '2024';  % 指定年份
 signal = 'S2W';
 path = 'F:\data\result\ver3\DTW_results\';
 
 % 定义站点列表
-stations = {'AIRA', 'BAIE', 'BIK0', 'CAS1'};
+stations = {'HAL1','AIRA','BAIE','BIK0'};
 
 % 动态加载 event_{year}_list.mat 文件
 event_file = sprintf('event_%s_list.mat', year);

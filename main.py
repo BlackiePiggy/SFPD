@@ -2,8 +2,8 @@
 from sfpd import calculate_sfpd
 
 # 可修改变量命名区
-years = ['2020','2021','2022']
-stations = ['AIRA', 'BAIE', 'BIK0', 'CAS1']
+years = ['2020','2021','2022','2023','2024']
+stations = ['HAL1','HLFX','KAT1','SAVO','STFU']
 signals = ['S2W']
 svn_range = range(1, 33)  # G01到G32的范围
 timestamp_format = '%Y-%m-%d %H:%M:%S'

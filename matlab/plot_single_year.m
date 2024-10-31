@@ -1,7 +1,7 @@
 clc; clear all;
 
 year = '2020';
-station = 'AIRA';
+station = 'KAT1';
 signal = 'S2W';
 satno = 'G01';
 

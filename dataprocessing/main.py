@@ -10,7 +10,7 @@ import elFilter as elft
 # CAS1 -66.283, 110.520, 22.6
 SS_variables = ['S2W']  # ['S1C', 'S1W', 'S2W']
 station_llh = [42.854, 74.533, 749.2]  # BAIE站点的经纬高
-station_name = 'BIK0'
+station_name = 'BAIE'
 el_mask = 20  # 高度截止角
 base_data_path = 'F:\\data' # 数据存储路径
 ################################################################################################
@@ -19,7 +19,7 @@ def generate_satellite_range(prefix, start, end):
 
 satellite_range = generate_satellite_range('G', 1, 32)
 
-for year in range(2022, 2023):  # 遍历2022到2023年
+for year in range(2020, 2021):  # 遍历2022到2023年
     test_start_date = f'{year}001'
     test_end_date = f'{year}365'
 
@@ -33,13 +33,13 @@ for year in range(2022, 2023):  # 遍历2022到2023年
     ######################################################################
 
     # 第一步：读取所有obs文件，提取CN值，存储到timeCN文件夹中
-    #readCN.read_CN_value_from_obs_AAO(station_name, SS_variables, 'all', test_input_obs_folder, test_output_cn_folder, test_start_date, test_end_date)  # 正常日期
+    readCN.read_CN_value_from_obs_AAO(station_name, SS_variables, 'all', test_input_obs_folder, test_output_cn_folder, test_start_date, test_end_date)  # 正常日期
 
-    readEL.read_el_from_sp3(station_name, test_input_sp3_dir, test_output_el_folder, satellite_range, station_llh, test_start_date, test_end_date)
-
-    combineCNEL.merge_cn_el_files(station_name, SS_variables, satellite_range, test_output_cn_folder, test_output_el_folder, test_output_cn_el_folder, test_start_date, test_end_date)  # 正常日期
-
-    elft.filter_cn_el_files(station_name, SS_variables, satellite_range, test_output_cn_el_folder, test_time_cn_el_filtered_folder, test_start_date, test_end_date, el_mask)  # 正常日期
+    # readEL.read_el_from_sp3(station_name, test_input_sp3_dir, test_output_el_folder, satellite_range, station_llh, test_start_date, test_end_date)
+    #
+    # combineCNEL.merge_cn_el_files(station_name, SS_variables, satellite_range, test_output_cn_folder, test_output_el_folder, test_output_cn_el_folder, test_start_date, test_end_date)  # 正常日期
+    #
+    # elft.filter_cn_el_files(station_name, SS_variables, satellite_range, test_output_cn_el_folder, test_time_cn_el_filtered_folder, test_start_date, test_end_date, el_mask)  # 正常日期
 
     print(f"Test Dataset for year {year} Generated Successfully!")
     ######################################################################
