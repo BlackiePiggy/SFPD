@@ -72,7 +72,7 @@ def read_CN_value_from_obs(station_name, SS_variables, satellite_code, input_fol
                 print(f"Warning: {SS_variable} not found in file {file}")
 
 # Read CN value from obs all at once
-def read_CN_value_from_obs_AAO(station_name, SS_variables, satellite_code, input_folder, output_folder, start_date_str,
+def read_CN_value_from_obs_AAO(station_name, SS_variables, input_folder, output_folder, start_date_str,
                                end_date_str):
     def list_files_in_directory(directory_path):
         if not os.path.exists(directory_path):
