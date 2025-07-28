@@ -1,7 +1,12 @@
+import sys
+sys.path.append('lib')
+sys.path.append('./')
+
 import gnsspy as gp
 import os
 import pandas as pd
 import utils
+
 
 def list_files_in_directory(directory_path):
     if not os.path.exists(directory_path):
@@ -143,11 +148,10 @@ def read_CN_value_from_obs_AAO(station_name, SS_variables, input_folder, output_
             else:
                 print(f"Warning: {SS_variable} not found in file {file}")
 
-def read_CN_value_from_obs_1D(SS_variables ,input_folder, output_folder):
+def read_CN_value_from_obs_1D(SS_variables ,input_folder, output_folder, sat_type):
     # 获取输入文件夹中的所有文件
     files_array = sorted(list_files_in_directory(input_folder))
-    # 创建输出目录
-    utils.create_directory_if_not_exists(output_folder)
+
     # 处理每个文件并保存对应的CSV文件
     for file in files_array:
         filename_base = os.path.splitext(file)[0]
@@ -164,9 +168,12 @@ def read_CN_value_from_obs_1D(SS_variables ,input_folder, output_folder):
                     timestamp, code = entry[0]
                     value = entry[1]
 
-                    # 如果 code 以 "G" 开头，保存到对应的列表中
-                    if code.startswith('G'):
+                    # 如果 code 以 sat_tpye 开头，保存到对应的列表中
+                    if code.startswith(sat_type):
                         if code not in satellite_data:
+                            # 如果value为nan值
+                            if value is None or pd.isna(value):
+                                print(f"Warning: Null value found for {SS_variable} in file {file}")
                             satellite_data[code] = []
                         satellite_data[code].append((timestamp, value))
 
@@ -174,7 +181,10 @@ def read_CN_value_from_obs_1D(SS_variables ,input_folder, output_folder):
                 for code, data in satellite_data.items():
                     if data:
                         output_filename = f'{filename_base[0:4]}_{filename_base[12:19]}_CN_{code}_{SS_variable}.csv'
-                        output_path = os.path.join(output_folder, output_filename)
+                        output_final_folder = f'{output_folder}/{code}/{SS_variable}'
+                        # 创建输出目录
+                        utils.create_directory_if_not_exists(output_final_folder)
+                        output_path = f'{output_final_folder}/{output_filename}'
 
                         if not os.path.exists(output_path):  # 检查输出文件是否已存在
                             df = pd.DataFrame(data, columns=['Timestamp', SS_variable])
@@ -243,3 +253,13 @@ def read_CN_value_from_obs_allfile(SS_variables, satellite_code, input_folder, o
                             print(f"File {output_path} already exists. Skipping...")
             else:
                 print(f"Warning: {SS_variable} not found in file {file}")
+
+
+# 作为主函数
+if __name__ == "__main__":
+    # 示例调用read_CN_value_from_obs_1D
+    SS_variables = ['S2I', 'S6I', 'S7I']
+    input_folder = '../data/obs/input'
+    output_folder = '../data/obs/output'
+    sat_type = 'C'
+    read_CN_value_from_obs_1D(SS_variables, input_folder, output_folder, sat_type)
