@@ -150,7 +150,7 @@ def read_CN_value_from_obs_1D(SS_variables ,input_folder, output_folder):
     utils.create_directory_if_not_exists(output_folder)
     # 处理每个文件并保存对应的CSV文件
     for file in files_array:
-        print(file)
+        filename_base = os.path.splitext(file)[0]
         file_path = os.path.join(input_folder, file)
         obs_info = gp.read_obsFile(file_path)
 
@@ -173,7 +173,7 @@ def read_CN_value_from_obs_1D(SS_variables ,input_folder, output_folder):
                 # 将不同 code 的数据分别保存到不同的 CSV 文件中
                 for code, data in satellite_data.items():
                     if data:
-                        output_filename = f'{filename_base[0:4]}_{filename_base[12:19]}_CN_{code}_{SS_variables[0]}.csv'
+                        output_filename = f'{filename_base[0:4]}_{filename_base[12:19]}_CN_{code}_{SS_variable}.csv'
                         output_path = os.path.join(output_folder, output_filename)
 
                         if not os.path.exists(output_path):  # 检查输出文件是否已存在
