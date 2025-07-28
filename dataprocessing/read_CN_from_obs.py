@@ -143,9 +143,7 @@ def read_CN_value_from_obs_AAO(station_name, SS_variables, input_folder, output_
             else:
                 print(f"Warning: {SS_variable} not found in file {file}")
 
-def read_CN_value_from_obs_1D(SS_variables ,input_folder, output_folder, date_str):
-    # 解析 date
-    date = pd.to_datetime(date_str, format='%Y%j')
+def read_CN_value_from_obs_1D(SS_variables ,input_folder, output_folder):
     # 获取输入文件夹中的所有文件
     files_array = sorted(list_files_in_directory(input_folder))
     # 创建输出目录
