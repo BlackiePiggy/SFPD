@@ -150,6 +150,7 @@ def read_CN_value_from_obs_1D(SS_variables ,input_folder, output_folder):
     utils.create_directory_if_not_exists(output_folder)
     # 处理每个文件并保存对应的CSV文件
     for file in files_array:
+        print(file)
         file_path = os.path.join(input_folder, file)
         obs_info = gp.read_obsFile(file_path)
 
