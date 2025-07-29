@@ -1,5 +1,5 @@
 import sys
-sys.path.append('lib')
+sys.path.append('./lib')
 sys.path.append('./')
 
 import gnsspy as gp
@@ -180,8 +180,10 @@ def read_CN_value_from_obs_1D(SS_variables ,input_folder, output_folder, sat_typ
                 # 将不同 code 的数据分别保存到不同的 CSV 文件中
                 for code, data in satellite_data.items():
                     if data:
-                        output_filename = f'{filename_base[0:4]}_{filename_base[12:19]}_CN_{code}_{SS_variable}.csv'
-                        output_final_folder = f'{output_folder}/{code}/{SS_variable}'
+                        # 如果code为"G 1"，即如果code中有空格，那么应该把这个空格换成0，那么code_full应该改成"G01"
+                        code_full = code.replace(' ', '0') if ' ' in code else code
+                        output_filename = f'{filename_base[0:4]}_{filename_base[12:19]}_CN_{code_full}_{SS_variable}.csv'
+                        output_final_folder = f'{output_folder}/{code_full}/{SS_variable}'
                         # 创建输出目录
                         utils.create_directory_if_not_exists(output_final_folder)
                         output_path = f'{output_final_folder}/{output_filename}'
