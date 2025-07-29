@@ -475,14 +475,18 @@ def read_obsFile_v3(obsFileName):
                 break
         # =============================================================================
         if obsLines[0][0] == ">":
-            epochLine = obsLines[0][1:].split()
-            if len(epochLine) == 8:
-                epoch_year, epoch_month, epoch_day, epoch_hour, epoch_minute, epoch_second, epoch_flag, epoch_SVNumber = obsLines[0][1:].split()
-                receiver_clock = 0 
-            elif len(epochLine) == 9:
-                epoch_year, epoch_month, epoch_day, epoch_hour, epoch_minute, epoch_second, epoch_flag, epoch_SVNumber, receiver_clock = obsLines[0][1:].split()
-            else: raise Warning("Unexpected epoch line format detected! | Program stopped!")
-        else: raise Warning("Unexpected format detected! | Program stopped!")
+            try:
+                epochLine = obsLines[0][1:].split()
+                if len(epochLine) == 8:
+                    epoch_year, epoch_month, epoch_day, epoch_hour, epoch_minute, epoch_second, epoch_flag, epoch_SVNumber = obsLines[0][1:].split()
+                    receiver_clock = 0
+                elif len(epochLine) == 9:
+                    epoch_year, epoch_month, epoch_day, epoch_hour, epoch_minute, epoch_second, epoch_flag, epoch_SVNumber, receiver_clock = obsLines[0][1:].split()
+                else:
+                    raise IndexError(f"Unexpected epochLine length: {len(epochLine)}")
+            except Exception as e:
+                print(f"⚠️ Warning: {e} — skipping this epoch and exiting loop")
+                break  # 跳出 epoch 处理主循环
         # =========================================================================
         if epoch_flag in {"1","3","5","6"}:
             raise Warning("Deal with this later!")
