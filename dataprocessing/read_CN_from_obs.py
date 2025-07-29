@@ -6,8 +6,7 @@ import gnsspy as gp
 import os
 import pandas as pd
 import utils
-import tqdm
-
+from tqdm import tqdm
 
 def list_files_in_directory(directory_path):
     if not os.path.exists(directory_path):
