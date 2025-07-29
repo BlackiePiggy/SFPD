@@ -6,6 +6,7 @@ import gnsspy as gp
 import os
 import pandas as pd
 import utils
+import tqdm
 
 
 def list_files_in_directory(directory_path):
@@ -153,7 +154,7 @@ def read_CN_value_from_obs_1D(SS_variables ,input_folder, output_folder, sat_typ
     files_array = sorted(list_files_in_directory(input_folder))
 
     # 处理每个文件并保存对应的CSV文件
-    for file in files_array:
+    for file in tqdm(files_array,desc="Reading CN data from file"):
         filename_base = os.path.splitext(file)[0]
         file_path = os.path.join(input_folder, file)
         obs_info = gp.read_obsFile(file_path)
