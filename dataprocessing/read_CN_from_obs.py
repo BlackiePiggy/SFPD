@@ -82,8 +82,7 @@ def read_CN_value_from_obs(station_name, SS_variables, satellite_code, input_fol
                 print(f"Warning: {SS_variable} not found in file {file}")
 
 # Read CN value from obs all at once
-def read_CN_value_from_obs_AAO(station_name, SS_variables, input_folder, output_folder, start_date_str,
-                               end_date_str):
+def read_CN_value_from_obs_AAO(station_name, SS_variables, input_folder, output_folder, start_date_str, end_date_str):
     # 解析 start_date 和 end_date
     start_date = pd.to_datetime(start_date_str, format='%Y%j')
     end_date = pd.to_datetime(end_date_str, format='%Y%j')
@@ -157,19 +156,19 @@ def read_CN_value_from_obs_1D(SS_variables ,input_folder, output_folder, sat_typ
         filename_base = os.path.splitext(file)[0]
 
         # ---------- 在执行读取前判断是否已经处理过 ----------
-        print("Checking if output already exists for:", file)
-        already_processed = False
-        for root, dirs, files in os.walk(output_folder):
-            for f in files:
-                if filename_base[0:4] in f:
-                    already_processed = True
-                    break
-            if already_processed:
-                break
-
-        if already_processed:
-            print(f"⏭️ Skipping {file}, output already exists.")
-            continue
+        # print("Checking if output already exists for:", file)
+        # already_processed = False
+        # for root, dirs, files in os.walk(output_folder):
+        #     for f in files:
+        #         if filename_base[0:4] in f:
+        #             already_processed = True
+        #             break
+        #     if already_processed:
+        #         break
+        #
+        # if already_processed:
+        #     print(f"⏭️ Skipping {file}, output already exists.")
+        #     continue
         # ------------------------------------------------------
 
         file_path = os.path.join(input_folder, file)
