@@ -155,6 +155,22 @@ def read_CN_value_from_obs_1D(SS_variables ,input_folder, output_folder, sat_typ
     # 处理每个文件并保存对应的CSV文件
     for file in tqdm(files_array,desc="Reading CN data from file"):
         filename_base = os.path.splitext(file)[0]
+
+        # ---------- 在执行读取前判断是否已经处理过 ----------
+        already_processed = False
+        for root, dirs, files in os.walk(output_folder):
+            for f in files:
+                if filename_base[0:4] in f:
+                    already_processed = True
+                    break
+            if already_processed:
+                break
+
+        if already_processed:
+            print(f"⏭️ Skipping {file}, output already exists.")
+            continue
+        # ------------------------------------------------------
+
         file_path = os.path.join(input_folder, file)
         obs_info = gp.read_obsFile(file_path)
 
