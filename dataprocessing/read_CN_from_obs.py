@@ -174,6 +174,10 @@ def read_CN_value_from_obs_1D(SS_variables ,input_folder, output_folder, sat_typ
 
         file_path = os.path.join(input_folder, file)
         obs_info = gp.read_obsFile(file_path)
+        # 如果obs_info为None，说明文件读取失败
+        if obs_info is None:
+            print(f"Error reading file {file}. Skipping...")
+            continue
 
         # 对每个 SS_variable 提取数据并按 code 保存
         for SS_variable in SS_variables:
