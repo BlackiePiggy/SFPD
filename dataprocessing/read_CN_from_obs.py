@@ -157,6 +157,7 @@ def read_CN_value_from_obs_1D(SS_variables ,input_folder, output_folder, sat_typ
         filename_base = os.path.splitext(file)[0]
 
         # ---------- 在执行读取前判断是否已经处理过 ----------
+        print("Checking if output already exists for:", file)
         already_processed = False
         for root, dirs, files in os.walk(output_folder):
             for f in files:
